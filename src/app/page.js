@@ -1,25 +1,39 @@
 "use client"
 import { useState } from 'react';
 
-export default function Home() {
+export default function Page() {
   const [subject, setSubject] = useState('');
-  const [message, setMessage] = useState('')
+  const [message, setMessage] = useState('');
 
   const sendMail = async (e) => {
     e.preventDefault();
 
-    const response = await fetch('/api/sendEmail', {
-      method: 'POST',
-      headers: {
-        'content-type': 'application/json'
-      },
-      body: JSON.stringify({
-        subject,
-        message
-      })
-    })
-    console.log(await response.json())
-  }
+    try {
+      const response = await fetch('/api/sendEmail', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({
+          subject,
+          message
+        })
+      });
+
+      const data = await response.json();
+      console.log(data);
+
+      if (response.ok) {
+        alert('Email sent successfully!');
+      } else {
+        alert('Failed to send email.');
+      }
+    } catch (error) {
+      console.error(error);
+      alert('An error occurred while sending the email.');
+    }
+  };
+
   return (
     <main className="flex min-h-screen flex-col items-center justify-center p-24">
       <form onSubmit={sendMail} className="h-full w-1/3 space-y-6">
@@ -27,37 +41,33 @@ export default function Home() {
           <h1 className="text-xl font-semibold">Tutorial Email</h1>
         </div>
         <div className="relative flex flex-col space-y-1">
-          <label htmlFor="title" className="text-sm font-light text-gray-500">
+          <label htmlFor="subject" className="text-sm font-light text-gray-500">
             Subject
           </label>
           <input
-            name="title"
+            name="subject"
             type="text"
-            id="title"
+            id="subject"
             required
             value={subject}
-            onChange={(e) => {
-              setSubject(e.target.value)
-            }}
-            placeholder="What will you title this goal?"
+            onChange={(e) => setSubject(e.target.value)}
+            placeholder="Enter the subject"
             className="rounded-xl border-2 border-gray-400 p-2"
           />
         </div>
         <div className="relative flex flex-col space-y-1">
-          <label htmlFor="title" className="text-sm font-light text-gray-500">
-            What would you need help with?
+          <label htmlFor="message" className="text-sm font-light text-gray-500">
+            Message
           </label>
           <textarea
-            name="description"
-            id="description"
+            name="message"
+            id="message"
             required
             cols={10}
             rows={5}
             value={message}
-            onChange={(e) => {
-              setMessage(e.target.value)
-            }}
-            placeholder="What will you title this goal?"
+            onChange={(e) => setMessage(e.target.value)}
+            placeholder="Enter your message"
             className="rounded-xl border-2 border-gray-400 p-2"
           />
         </div>
@@ -65,7 +75,6 @@ export default function Home() {
           <span>Send Message</span>
         </button>
       </form>
-      
     </main>
-  )
+  );
 }
